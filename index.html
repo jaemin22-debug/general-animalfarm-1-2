@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pronunciation Practice</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background-color: #f5f5f7; }
+        .container { max-width: 500px; width: 90%; background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); text-align: center; }
+        h2 { color: #1d1d1f; margin-bottom: 30px; font-weight: 600; }
+        .script-box { background: #f9f9fb; padding: 25px; border-radius: 15px; text-align: left; margin-bottom: 30px; border-left: 6px solid #007aff; }
+        .script-box p { margin: 12px 0; font-size: 1.15em; color: #333; line-height: 1.5; font-weight: 500; }
+        .controls { display: flex; flex-direction: column; gap: 12px; }
+        button { padding: 16px; font-size: 1em; border-radius: 14px; border: none; cursor: pointer; transition: all 0.2s ease; font-weight: 600; }
+        
+        #recordBtn { background-color: #ff3b30; color: white; }
+        #recordBtn.recording { background-color: #8e8e93; animation: pulse 1.5s infinite; }
+        #playBtn { background-color: #34c759; color: white; display: none; }
+        #downloadBtn { background-color: #007aff; color: white; display: none; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        audio { margin-top: 25px; width: 100%; display: none; }
+        .status-text { font-size: 0.9em; color: #86868b; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Pronunciation Practice</h2>
+    
+    <div class="script-box">
+        <p>Red Lorry, Yellow Lorry. <br>Red Lorry, Yellow Lorry.</p>
+        <p>Real Rare Light in the Room. <br>Real Rare Light in the Room.</p>
+        <p>The Leader Reads the Letter. <br>The Leader Reads the Letter.</p>
+    </div>
+
+    <div class="controls">
+        <button id="recordBtn">Start Recording</button>
+        <button id="playBtn">Listen to My Voice</button>
+        <button id="downloadBtn">Download Audio (.webm)</button>
+    </div>
+
+    <audio id="audioPlayback" controls></audio>
+    <p id="status" class="status-text">버튼을 눌러 녹음을 시작하세요.</p>
+</div>
+
+<script>
+    let mediaRecorder;
+    let audioChunks = [];
+    const recordBtn = document.getElementById('recordBtn');
+    const playBtn = document.getElementById('playBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const audioPlayback = document.getElementById('audioPlayback');
+    const statusText = document.getElementById('status');
+
+    recordBtn.addEventListener('click', async () => {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+            recordBtn.textContent = "Start Recording";
+            recordBtn.classList.remove('recording');
+            statusText.textContent = "녹음이 완료되었습니다. 들어보거나 다운로드하세요.";
+        } else {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayback.src = audioUrl;
+                    
+                    playBtn.style.display = "block";
+                    downloadBtn.style.display = "block";
+                    
+                    downloadBtn.onclick = () => {
+                        const link = document.createElement('a');
+                        link.href = audioUrl;
+                        link.download = 'pronunciation_practice.webm';
+                        link.click();
+                    };
+                };
+
+                mediaRecorder.start();
+                recordBtn.textContent = "Stop Recording";
+                recordBtn.classList.add('recording');
+                statusText.textContent = "지금 녹음 중입니다...";
+            } catch (err) {
+                alert("마이크 접근 권한이 필요합니다.");
+            }
+        }
+    });
+
+    playBtn.addEventListener('click', () => {
+        audioPlayback.play();
+    });
+</script>
+
+</body>
+</html>
