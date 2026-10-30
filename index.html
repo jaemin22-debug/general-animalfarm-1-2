@@ -1,104 +1,320 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pronunciation Practice</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background-color: #f5f5f7; }
-        .container { max-width: 500px; width: 90%; background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); text-align: center; }
-        h2 { color: #1d1d1f; margin-bottom: 30px; font-weight: 600; }
-        .script-box { background: #f9f9fb; padding: 25px; border-radius: 15px; text-align: left; margin-bottom: 30px; border-left: 6px solid #007aff; }
-        .script-box p { margin: 12px 0; font-size: 1.15em; color: #333; line-height: 1.5; font-weight: 500; }
-        .controls { display: flex; flex-direction: column; gap: 12px; }
-        button { padding: 16px; font-size: 1em; border-radius: 14px; border: none; cursor: pointer; transition: all 0.2s ease; font-weight: 600; }
-        
-        #recordBtn { background-color: #ff3b30; color: white; }
-        #recordBtn.recording { background-color: #8e8e93; animation: pulse 1.5s infinite; }
-        #playBtn { background-color: #34c759; color: white; display: none; }
-        #downloadBtn { background-color: #007aff; color: white; display: none; }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        audio { margin-top: 25px; width: 100%; display: none; }
-        .status-text { font-size: 0.9em; color: #86868b; margin-top: 15px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>동물농장 1~2장 이해도 퀴즈</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .quiz-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .question-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #0f172a;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background-color 0.2s;
+      user-select: none;
+    }
+
+    .option-label:hover {
+      background-color: #f1f5f9;
+    }
+
+    .option-label input[type="radio"] {
+      margin-right: 0.75rem;
+      accent-color: var(--primary);
+    }
+
+    .btn-container {
+      text-align: center;
+      margin: 2.5rem 0;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 0.85rem 2.5rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    #result-box {
+      display: none;
+      text-align: center;
+      padding: 2rem 1.5rem;
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      margin-top: 1.5rem;
+    }
+
+    #result-box h2 {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Pronunciation Practice</h2>
-    
-    <div class="script-box">
-        <p>Red Lorry, Yellow Lorry. <br>Red Lorry, Yellow Lorry.</p>
-        <p>Real Rare Light in the Room. <br>Real Rare Light in the Room.</p>
-        <p>The Leader Reads the Letter. <br>The Leader Reads the Letter.</p>
+  <div class="container">
+    <header>
+      <h1>조지 오웰 『동물농장』 1~2장 퀴즈</h1>
+      <p>각 문항을 읽고 정답을 선택한 후, 하단의 '제출하기' 버튼을 눌러주세요.</p>
+    </header>
+
+    <form id="quiz-form">
+      <!-- 1번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">1. 1장에서 늙은 메이저(Old Major) 영감이 동물들을 모아놓고 연설을 하게 된 계기는 무엇인가요?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q1" value="1"> 1. 새로운 풍차 건설 계획을 발표하기 위해서였다.</label>
+          <label class="option-label"><input type="radio" name="q1" value="2"> 2. 존스가 농장을 팔아넘기려 한다는 소문을 들었기 때문이다.</label>
+          <label class="option-label"><input type="radio" name="q1" value="3"> 3. 자신이 곧 죽을 것을 예감하고, 지난밤에 꾼 기이한 꿈 이야기를 전해주고 싶어서였다.</label>
+          <label class="option-label"><input type="radio" name="q1" value="4"> 4. 존스가 술에 취해 동물들을 학대했기 때문에 복수를 논의하기 위해서였다.</label>
+        </div>
+      </div>
+
+      <!-- 2번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">2. 메이저 영감이 지목한, 동물들의 삶을 비참하게 만드는 유일한 적은 누구(무엇)인가요?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q2" value="1"> 1. 추운 날씨</label>
+          <label class="option-label"><input type="radio" name="q2" value="2"> 2. 게으른 동물들</label>
+          <label class="option-label"><input type="radio" name="q2" value="3"> 3. 인간</label>
+          <label class="option-label"><input type="radio" name="q2" value="4"> 4. 늑대와 여우</label>
+        </div>
+      </div>
+
+      <!-- 3번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">3. 메이저 영감이 동물들에게 가르쳐 준, 혁명가(歌)가 된 노래의 제목은 무엇인가요?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q3" value="1"> 1. 네 다리는 좋고 두 다리는 나쁘다 (Four legs good, two legs bad)</label>
+          <label class="option-label"><input type="radio" name="q3" value="2"> 2. 영국의 동물들 (Beasts of England)</label>
+          <label class="option-label"><input type="radio" name="q3" value="3"> 3. 존스를 몰아내자 (Let's kick out Jones)</label>
+          <label class="option-label"><input type="radio" name="q3" value="4"> 4. 동물농장의 아침 (The morning of Animal Farm)</label>
+        </div>
+      </div>
+
+      <!-- 4번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">4. 메이저 영감 사후, 그의 가르침을 '동물주의(Animalism)'라는 사상 체계로 발전시킨 돼지 중 과묵하고 심지가 굳어보이던 돼지의 이름은?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q4" value="1"> 1. 스노볼</label>
+          <label class="option-label"><input type="radio" name="q4" value="2"> 2. 스퀼러</label>
+          <label class="option-label"><input type="radio" name="q4" value="3"> 3. 벤자민</label>
+          <label class="option-label"><input type="radio" name="q4" value="4"> 4. 나폴레옹</label>
+        </div>
+      </div>
+
+      <!-- 5번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">5. 동물들에게 죽어서 갈 수 있는 '설탕과자산(Sugarcandy Mountain)'의 존재가 있다고 주장하는 까마귀의 이름은?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q5" value="1"> 1. 몰리</label>
+          <label class="option-label"><input type="radio" name="q5" value="2"> 2. 모세</label>
+          <label class="option-label"><input type="radio" name="q5" value="3"> 3. 복서</label>
+          <label class="option-label"><input type="radio" name="q5" value="4"> 4. 바울</label>
+        </div>
+      </div>
+
+      <!-- 6번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">6. 혁명은 계획된 날짜보다 훨씬 일찍, 우발적으로 일어났습니다. 혁명을 촉발한 직접적인 원인은 무엇인가요?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q6" value="1"> 1. 존스와 일꾼들이 동물들에게 밥 주는 것을 잊어버려 굶주렸기 때문</label>
+          <label class="option-label"><input type="radio" name="q6" value="2"> 2. 돼지들이 미리 날짜를 정하고 신호를 보냈기 때문</label>
+          <label class="option-label"><input type="radio" name="q6" value="3"> 3. 메이저 영감의 장례식에서 존스가 모욕을 주었기 때문</label>
+          <label class="option-label"><input type="radio" name="q6" value="4"> 4. 존스가 술에 취해 동물들에게 총을 쏘았기 때문</label>
+        </div>
+      </div>
+
+      <!-- 7번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">7. 2장에서 돼지들이 헛간 큰 벽에 흰 페인트로 써놓은 '칠계명(Seven Commandments)' 중 가장 마지막 계명(제7계명)은 무엇인가요?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q7" value="1"> 1. 어떤 동물도 옷을 입어서는 안 된다.</label>
+          <label class="option-label"><input type="radio" name="q7" value="2"> 2. 어떤 동물도 침대에서 자서는 안 된다.</label>
+          <label class="option-label"><input type="radio" name="q7" value="3"> 3. 네 발로 걷거나 날개를 가진 자는 모두 친구다.</label>
+          <label class="option-label"><input type="radio" name="q7" value="4"> 4. 모든 동물은 평등하다.</label>
+        </div>
+      </div>
+
+      <!-- 8번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">8. 혁명 이후 건초 수확과 농장 일에 가장 헌신적으로 참여하며, "내가 더 열심히 일하겠다(I will work harder)"를 좌우명으로 삼은 짐수레말의 이름은?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q8" value="1"> 1. 복서(Boxer)</label>
+          <label class="option-label"><input type="radio" name="q8" value="2"> 2. 클로버(Clover)</label>
+          <label class="option-label"><input type="radio" name="q8" value="3"> 3. 몰리(Mollie)</label>
+          <label class="option-label"><input type="radio" name="q8" value="4"> 4. 벤자민(Benjamin)</label>
+        </div>
+      </div>
+
+      <!-- 9번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">9. 존스와 인간들을 몰아낸 직후, 동물들이 가장 먼저 한 행동 중 하나는 무엇인가요?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q9" value="1"> 1. 다른 농장의 동물들을 공격하러 갔다.</label>
+          <label class="option-label"><input type="radio" name="q9" value="2"> 2. 즉시 풍차 건설을 시작했다.</label>
+          <label class="option-label"><input type="radio" name="q9" value="3"> 3. 인간이 동물들을 억압하던 도구(채찍, 코뚜레, 재갈 등)를 모두 파괴하거나 불태웠다.</label>
+          <label class="option-label"><input type="radio" name="q9" value="4"> 4. 존스의 집으로 들어가 침대에서 잠을 잤다.</label>
+        </div>
+      </div>
+
+      <!-- 10번 문제 -->
+      <div class="quiz-card">
+        <div class="question-title">10. 2장의 마지막 장면에서, 동물들이 건초 수확을 하러 간 사이 사라진 것은 무엇인가요?</div>
+        <div class="options">
+          <label class="option-label"><input type="radio" name="q10" value="1"> 1. 창고에 있던 위스키</label>
+          <label class="option-label"><input type="radio" name="q10" value="2"> 2. 돼지들이 짜낸 다섯 양동이의 우유</label>
+          <label class="option-label"><input type="radio" name="q10" value="3"> 3. 몰리가 숨겨둔 설탕</label>
+          <label class="option-label"><input type="radio" name="q10" value="4"> 4. 존스의 모자</label>
+        </div>
+      </div>
+
+      <div class="btn-container">
+        <button type="button" onclick="submitQuiz()">제출하기</button>
+      </div>
+    </form>
+
+    <div id="result-box">
+      <h2 id="score-text"></h2>
     </div>
+  </div>
 
-    <div class="controls">
-        <button id="recordBtn">Start Recording</button>
-        <button id="playBtn">Listen to My Voice</button>
-        <button id="downloadBtn">Download Audio (.webm)</button>
-    </div>
+  <script>
+    const answers = {
+      q1: "3", //[cite: 1]
+      q2: "3", //[cite: 2]
+      q3: "2", //[cite: 3]
+      q4: "4", //[cite: 4]
+      q5: "2", //[cite: 5]
+      q6: "1", //[cite: 6]
+      q7: "4",
+      q8: "1",
+      q9: "3", //[cite: 7]
+      q10: "2" //[cite: 8]
+    };
 
-    <audio id="audioPlayback" controls></audio>
-    <p id="status" class="status-text">버튼을 눌러 녹음을 시작하세요.</p>
-</div>
+    function submitQuiz() {
+      const form = document.getElementById("quiz-form");
+      const totalQuestions = Object.keys(answers).length;
+      let score = 0;
+      let allAnswered = true;
 
-<script>
-    let mediaRecorder;
-    let audioChunks = [];
-    const recordBtn = document.getElementById('recordBtn');
-    const playBtn = document.getElementById('playBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const audioPlayback = document.getElementById('audioPlayback');
-    const statusText = document.getElementById('status');
-
-    recordBtn.addEventListener('click', async () => {
-        if (mediaRecorder && mediaRecorder.state === "recording") {
-            mediaRecorder.stop();
-            recordBtn.textContent = "Start Recording";
-            recordBtn.classList.remove('recording');
-            statusText.textContent = "녹음이 완료되었습니다. 들어보거나 다운로드하세요.";
-        } else {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    audioPlayback.src = audioUrl;
-                    
-                    playBtn.style.display = "block";
-                    downloadBtn.style.display = "block";
-                    
-                    downloadBtn.onclick = () => {
-                        const link = document.createElement('a');
-                        link.href = audioUrl;
-                        link.download = 'pronunciation_practice.webm';
-                        link.click();
-                    };
-                };
-
-                mediaRecorder.start();
-                recordBtn.textContent = "Stop Recording";
-                recordBtn.classList.add('recording');
-                statusText.textContent = "지금 녹음 중입니다...";
-            } catch (err) {
-                alert("마이크 접근 권한이 필요합니다.");
-            }
+      // 미선택 문항 확인
+      for (let i = 1; i <= totalQuestions; i++) {
+        if (!form[`q${i}`].value) {
+          allAnswered = false;
+          break;
         }
-    });
+      }
 
-    playBtn.addEventListener('click', () => {
-        audioPlayback.play();
-    });
-</script>
+      if (!allAnswered) {
+        if (!confirm("아직 풀지 않은 문제가 있습니다. 그래도 제출하시겠습니까?")) {
+          return;
+        }
+      }
 
+      // 점수 계산 (문항별 피드백/색상 표시 없음)
+      for (let i = 1; i <= totalQuestions; i++) {
+        if (form[`q${i}`].value === answers[`q${i}`]) {
+          score++;
+        }
+      }
+
+      // 결과 영역에 총점만 노출
+      const resultBox = document.getElementById("result-box");
+      const scoreText = document.getElementById("score-text");
+
+      resultBox.style.display = "block";
+      scoreText.textContent = `총 10문제 중 ${score}문제를 맞혔습니다.`;
+      resultBox.scrollIntoView({ behavior: "smooth" });
+    }
+  </script>
 </body>
 </html>
